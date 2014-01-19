@@ -1,4 +1,4 @@
-=== Password Policy Manager ===
+=== WP Password Policy Manager ===
 Contributors: WPWhiteSecurity
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
