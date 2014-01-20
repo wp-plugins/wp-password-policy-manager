@@ -7,7 +7,7 @@ Requires at least: 3.0.1
 Tested up to: 3.8
 Stable tag: 0.1
 
-Configure strong WordPress password policies for users to improve the security of your WordPress by ensuring users are not using weak passwords.
+Ensure the security of your WordPress by forcing users to use strong passwords by configuring WordPress password policies.
 
 == Description ==
 
