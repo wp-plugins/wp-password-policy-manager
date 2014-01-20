@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: WP Password Policy Manager
-Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wordpress-password-policy-manager-plugin/
+Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/
 Description: Configure strong WordPress password policies for users to improve the security of your WordPress by ensuring users are not using weak passwords.
 Author: WP White Security
 Version: 0.1
