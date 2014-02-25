@@ -21,11 +21,11 @@ Your WordPress users do not have to get used to new systems or procedures; WP Pa
 
 = Configurable WordPress Password Policies =
 WordPress Administrators can configure any of the below policies to ensure their users are using strong WordPress passwords:
-* Password Age
-* Minumum Password Length
-* Mixed Case Policy (enforce users to use both uppercase and lowercase characters in passwords)
-* Numeric Digits Policy (enforce users to use numbers in their passwords)
-* Special Characters Policy (enforce users to use special characters in their passwords) 
+  * Password Age
+  * Minumum Password Length
+  * Mixed Case Policy (enforce users to use both uppercase and lowercase characters in passwords)
+  * Numeric Digits Policy (enforce users to use numbers in their passwords)
+  * Special Characters Policy (enforce users to use special characters in their passwords) 
 
 = Built-in WordPress Password Policies =
 Once a WordPress user's password expires, the new password:
