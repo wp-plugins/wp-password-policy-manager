@@ -1,41 +1,51 @@
 === WP Password Policy Manager ===
 Contributors: WPWhiteSecurity
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=abela%2erobert%40gmail%2ecom
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
-Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong wordpress password
-Requires at least: 3.0.1
-Tested up to: 4.0
-Stable tag: 0.2
+Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong password, strong wordpress password, authentication, password security, password expire, strong wordpress password plugin 
+Requires at least: 3.6.0
+Tested up to: 4.0.1
+Stable tag: 0.3
 
-Configure strong WordPress password policies for users to improve the security of your WordPress by ensuring users are not using weak passwords.
+Configure WordPress password policies to ensure all WordPress users use strong passwords and improve the security of your WordPress.
 
 == Description ==
 
 = Ensure WordPress Users Use Strong Passwords =
-Thousands of WordPress blogs and websites get hacked each year because users use weak passwords. Do not let your WordPress become a statistic; ensure that all your WordPress users use strong passwords and change them frequently with WP Password Policy Manager plugin.
+Thousands of WordPress blogs and websites get hacked each year because of weak passwords. One way to [protect your WordPress from automated brute force attacks](http://www.wpwhitesecurity.com/wordpress-security/protect-wordpress-brute-force-attacks/) is to use strong passwords. Do not let your WordPress become a statistic. Ensure that all your WordPress users use strong passwords and change them frequently with WP Password Policy Manager plugin.
 
 = Why WP Password Policy Manager? =
-With WP Password policy manager you can easily configure WordPress password policies to enforce users to use strong passwords.
-
-Your WordPress users do not have to get used to new systems or procedures; WP Password Policy Manager integrates seamlessly within your WordPress login page and uses the standard WordPress UI as can be seen from these [screenshots](http://wordpress.org/plugins/wp-password-policy-manager/screenshots/). 
+You can easily configure strong WordPress password policies within a few seconds and your WordPress users do not have to get used to new systems and interfaces. WP Password Policy Manager integrates seamlessly within your WordPress login page and uses the standard WordPress UI as can be seen from these [screenshots](http://wordpress.org/plugins/wp-password-policy-manager/screenshots/), hence the process is transparent to your users. 
 
 = Configurable WordPress Password Policies =
-WordPress Administrators can configure any of the below policies to ensure their users are using strong WordPress passwords:
+As a WordPress administrators you can configure any of the below password policies to ensure all your WordPress users use strong password:
 
-* Password Age
-* Minimum Password Length
-* Mixed Case Policy (enforce users to use both uppercase and lowercase characters in passwords)
-* Numeric Digits Policy (enforce users to use numbers in their passwords)
-* Special Characters Policy (enforce users to use special characters in their passwords) 
+> <strong>Password Expire Time</strong><br>
+> This policy allows you to specify for how long a password is valid before it expires. For example if you specify 1 month, after 1 month the WordPress user will be forced to change his existing password prior to logging in.
+>
+> <strong>Password Length</strong><br>
+> This policy allows you to specify the minimum number of characters a password should consist of.
+>
+> <strong>Mixed Case Policy</strong><br>
+> When you enable this policy all of the WordPress users' passwords should contain both lower and UPPER case characters.
+>
+> <strong>Numeric Digits Policy</strong><br>
+* When you enable this policy all of the WordPress users' passwords should contain numeric digits.
+>
+> <strong>Special Characters Policy</strong><br>
+> When you enable this policy all of the WordPress users' passwords should contain special characters, such as ! ? * & etc.
+>
+> <strong>Password History Policy</strong><br>
+> This policy allows you to specify how many passwords should the plugin remember so WordPress users do not use the same password. For example if you specify 8 the user can reuse an old password on the ninth time his password is changed.
+>
+> <strong>Note:<strong>WP Password Policy Manager stored users' passwords the same way WordPress stores them, hence it is secure.
 
-= Built-in WordPress Password Policies =
-Once a WordPress user's password expires, the new password:
+= Reset All WordPress Users Password with One Click =
+In case your WordPress has been hacked or need to reset all WordPress users' password you can do so with a single click from the passwords policies configuration. Once you reset all of the WordPress users' passwords each user will receive an email with a new random generated password. Since the password is sent over email once the WordPress users log in they will be asked to change the password again to ensure maximum security.
 
-* Cannot be the same as the username
-* Cannot be the same as the previous one
-
-= Changing the WordPress Password =
-Once a WordPress user's password is expired, he or she is notified upon trying to login. To assist the user in choosing a strong password, the policies are also listed in the login page as can be seen in the [screenshots](http://wordpress.org/plugins/wp-password-policy-manager/screenshots/).
+= Keep Track of All WordPress Users Activity on WordPress =
+Another way to ensure WordPress security is to have full control of your WordPress by keeping an audit log of all changes that happen on your [WordPress with WP Security Audit Log](https://wordpress.org/plugins/wp-security-audit-log/) plugin.
 
 = Plugin Newsletter =
 To keep yourself updated with what is new and updated in our WordPress security plugins please subscribe to the [WP White Security Plugins Newsletter](http://eepurl.com/Jn9sP).
@@ -53,28 +63,42 @@ To keep yourself updated with what is new and updated in our WordPress security 
 == Frequently Asked Questions ==
 
 = How will a user know that his or her password is expired? =
-If a WordPress user's password is expired, the user will be notified and asked to change the password upon trying to login to WordPress.
 
-= How can I disable a WordPress password policy? =
-If you do not specify a value for a specific policy it is automatically disabled. Alternatively untick the check box next to the policy from the Password Policies nodes in the WordPress Settings.
+If a WordPress user's password is expired, the user will be notified and asked to change the password upon trying to login to WordPress.
 
 == Screenshots ==
 
-1. Expired password login page allows users to specify a new password and instructs them of which policies are enabled
-2. Administrators can configure password policies from the Password Policies node in WordPress settings 
+1. Expired password login page allows the user to specify a new password
+2. Administrators can configure password policies from the Password Policies node in WordPress settings
+3. WordPress password policies are also applied in the WordPress user profile page ensuring users always use strong passwords
+4. WordPress password policies are also applied in the lost / reset password page in WordPress ensuring strong password policies are never bypassed
 
 == Changelog ==
 
-= 0.2 (2014-02-25) =
-* New Password Policies
-  * Password length policy - specify the minimum length a password should be
-  * Mixed case policy - if enabled, users should use both uppercase and lowercase characters in passwords
-  * Numeric Digits policy - if enabled, users should use numeric digits in their passwords
-  * Special Character policy - if enabled, users should use special characters in their passwords
+= 0.3 (2014-11-24) =
+* **New Plugin Features**
+	* Password policies now also enforced in WordPress user profile page therefore when a user changes his own or someone's else password from the profile page he should adhere to the policies
+	* Password policies now also enforced in "WordPress Lost Password" page, therefore when a user uses the "Lost Password" link in the login the new password should adhere to the policies
+	* Added Reset All Passwords functionality - administrators can reset the passwords of all users with just 1 click (email is sent to all users with new password and once they login they should change their password again) 
+	* Excempt users and roles from policies - administrators can excempt users and roles from the password policies
+	* Added link to Password Policies in the WordPress plugins page
+	
+* **New Password Policy**
+	* Password history - if enabled the plugin will remember a configurable number of previous passwords the WordPress user already used to avoid using the same password
 
-* New Plugin Features
-  * Added list of enabled policies in password reset screen to help users generate a strong password
-  * Added a notification box which pops up on installation to help administrators configure the password policies             
+* **Bug Fix**
+	* Fixed an issue related to timezones [support ticket](https://wordpress.org/support/topic/date_default_timezone_set-timezone-id-is-invalid-1)
+
+= 0.2 (2014-02-25) =
+* **New Password Policies**
+	* Password length policy - specify the minimum length a user's password should be
+	* Mixed case policy - if enabled users should use both lower and UPPERcase characters in their passwords
+	* Numeric digits policy - if enabled users should use numeric digits in their passwords
+	* Special characters policy - ie enabled users should use special characters in their passwords
+	
+* **New Plugin Features**
+	* Added list of enabled policies in password reset page for users to follow when writing a new password
+	* Added a popup notification box so after install administrators can immediately configure the password policies
 
 = 0.1 (2014-01-15) =
-* Initial release
+* **Initial release**
