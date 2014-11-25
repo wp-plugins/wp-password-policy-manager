@@ -76,29 +76,29 @@ If a WordPress user's password is expired, the user will be notified and asked t
 == Changelog ==
 
 = 0.3 (2014-11-24) =
-**New Plugin Features**
+* **New Plugin Features**
 	* Password policies now also enforced in WordPress user profile page therefore when a user changes his own or someone's else password from the profile page he should adhere to the policies
 	* Password policies now also enforced in "WordPress Lost Password" page, therefore when a user uses the "Lost Password" link in the login the new password should adhere to the policies
 	* Added Reset All Passwords functionality - administrators can reset the passwords of all users with just 1 click (email is sent to all users with new password and once they login they should change their password again) 
 	* Excempt users and roles from policies - administrators can excempt users and roles from the password policies
 	* Added link to Password Policies in the WordPress plugins page
 	
-**New Password Policy**
+* **New Password Policy**
 	* Password history - if enabled the plugin will remember a configurable number of previous passwords the WordPress user already used to avoid using the same password
 
-**Bug Fix**
+* **Bug Fix**
 	* Fixed an issue related to timezones [support ticket](https://wordpress.org/support/topic/date_default_timezone_set-timezone-id-is-invalid-1)
 
 = 0.2 (2014-02-25) =
-**New Password Policies**
+* **New Password Policies**
 	* Password length policy - specify the minimum length a user's password should be
 	* Mixed case policy - if enabled users should use both lower and UPPERcase characters in their passwords
 	* Numeric digits policy - if enabled users should use numeric digits in their passwords
 	* Special characters policy - ie enabled users should use special characters in their passwords
 	
-**New Plugin Features**
+* **New Plugin Features**
 	* Added list of enabled policies in password reset page for users to follow when writing a new password
 	* Added a popup notification box so after install administrators can immediately configure the password policies
 
 = 0.1 (2014-01-15) =
-**Initial release**
+* **Initial release**
