@@ -4,7 +4,7 @@ Plugin Name: WordPress Password Policy Manager
 Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wordpress-password-policy-manager-plugin/
 Description: WordPress Password Policy Manager allows WordPress administrators to configure password policies for WordPress users to use strong passwords.
 Author: WP White Security
-Version: 0.3
+Version: 0.4
 Author URI: http://www.wpwhitesecurity.com/
 License: GPL2
 
@@ -80,7 +80,7 @@ class WpPasswordPolicyManager
         //-- user profile
         add_action( 'show_user_profile', array($this, 'ModifyUserProfilePage')); // user -> own profile
         add_action( 'edit_user_profile', array($this, 'ModifyUserProfilePage')); // admin -> user profile
-        add_filter( 'user_profile_update_errors', array($this, 'ValidateUserProfilePage'), 10, 3);
+        add_action( 'user_profile_update_errors', array( $this, 'ValidateUserProfilePage' ), 0, 3 );
         //-- pwd reset
         add_action( 'validate_password_reset', array($this,'ValidatePasswordReset'), 10, 2 );
         add_action( 'validate_password_reset', array($this,'ModifyWpResetForm'), 10);
@@ -122,7 +122,6 @@ class WpPasswordPolicyManager
             $rules[] = sprintf(__('contain special characters'));
         return $rules;
     }
-
 
     protected $pwd = '';
     function ModifyLoginForm(){
@@ -284,6 +283,21 @@ class WpPasswordPolicyManager
     <?php }
 
     public function ValidateUserProfilePage($errors, $update = null, $user = null){
+        $pass1 = (isset($_REQUEST['pass1']) ? $_REQUEST['pass1'] : '');
+        $pass2 = (isset($_REQUEST['pass2']) ? $_REQUEST['pass2'] : '');
+        return $this->__validateProfile($errors, $user, $pass1, $pass2);
+    }
+
+    /**
+     * Validates the User profile page
+     * @internal
+     * @param $errors
+     * @param $user
+     * @param $pass1
+     * @param $pass2
+     * @return mixed
+     */
+    protected function __validateProfile($errors, $user, $pass1, $pass2){
         if($user){
             if(! isset($user->ID)){
                 return $errors;
@@ -300,11 +314,8 @@ class WpPasswordPolicyManager
         if(!$this->IsUserExemptFromPolicies($user))
         {
             // If the user updates their password, it should comply with the policies
-            if((isset($_REQUEST['pass1']) && isset($_REQUEST['pass2'])) && (!empty($_REQUEST['pass1']) && !empty($_REQUEST['pass2'])))
+            if((isset($pass1) && isset($pass2)) && (!empty($pass1) && !empty($pass2)))
             {
-                $pass1 = trim($_REQUEST['pass1']);
-                $pass2 = trim($_REQUEST['pass2']);
-
                 if(empty($pass1) || empty($pass2)){
                     $errors->add('expired_password', '<strong>ERROR</strong>: The new password cannot be empty.');
                     return $errors;
@@ -313,10 +324,9 @@ class WpPasswordPolicyManager
                     $errors->add('expired_password', '<strong>ERROR</strong>: Both new passwords must match.');
                     return $errors;
                 }
-                $p1md5 = md5($pass1);
                 // get the current pass
                 $crtPwd = $userInfo->user_pass;
-                if($crtPwd == $p1md5){
+                if(wp_check_password($pass1, $crtPwd, $user->ID)){
                     $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the old one.');
                     return $errors;
                 }
@@ -374,10 +384,10 @@ class WpPasswordPolicyManager
 //                }
                 //----
                 $this->SetGlobalOption(self::OPT_USER_RST_PWD . '_' . $user->ID, false);
-                update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp')+(60*2));
+                update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp')+(strtotime($this->GetPasswordTtl())));
             }
         }
-        return $user;
+        return $errors;
     }
 
     public function ModifyWpResetForm() {
@@ -1080,14 +1090,6 @@ class WpPasswordPolicyManager
         $users = get_users(array('fields' => array('ID')));
         foreach ($users as $user)
             self::ClearUserPrevPwds($user->ID);
-        self::_deleteOptions();
-    }
-    //-----------------------
-    //TODO: JUST FOR NOW - DEBUG ONLY - VERIFY BEFORE RELEASE
-    protected static function _deleteOptions(){
-        global $wpdb;
-        $wpdb->query("DELETE FROM ".$wpdb->usermeta." WHERE meta_key LIKE '%wppm%'");
-        $wpdb->query("DELETE FROM ".$wpdb->options." WHERE option_name LIKE '%wppm%'");
     }
     // </editor-fold>
 }
