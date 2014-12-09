@@ -1,6 +1,6 @@
 jQuery(function($){
-    if(window.wppm_ModifyForm) {
-        var form = $('#resetpassform'),data = form.html(), d = window.wppm_ModifyForm;
+    if(wppm_ModifyForm) {
+        var form = $('#resetpassform'),data = form.html(), d = wppm_ModifyForm;
         form.html($('<div id="wp-reset-container"></div>').html(data));
         var u = $('<ul/>').css({'list-style': 'inside disc'});
         for (var i in d.NewPasswordRules)

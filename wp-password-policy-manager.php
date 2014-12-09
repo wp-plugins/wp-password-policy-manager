@@ -4,7 +4,7 @@ Plugin Name: WordPress Password Policy Manager
 Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wordpress-password-policy-manager-plugin/
 Description: WordPress Password Policy Manager allows WordPress administrators to configure password policies for WordPress users to use strong passwords.
 Author: WP White Security
-Version: 0.4
+Version: 0.5
 Author URI: http://www.wpwhitesecurity.com/
 License: GPL2
 
@@ -43,6 +43,7 @@ class WpPasswordPolicyManager
     const POLICY_MIXCASE = 'C';
     const POLICY_NUMBERS = 'N';
     const POLICY_SPECIAL = 'S';
+    const POLICY_OLDPASSWORD = 'O';
     const DEF_OPT_TTL = '';
     const DEF_OPT_LEN = 0;
     const DEF_OPT_CPT = false;
@@ -136,6 +137,9 @@ class WpPasswordPolicyManager
             if(empty($username)){
                 return;
             }
+            if (!username_exists($username)) {
+                return;
+            }
         }
 
         if(!empty($this->pwd)){
@@ -153,11 +157,12 @@ class WpPasswordPolicyManager
             // policies do not apply in this case
             return;
         }
+        if(!wp_check_password($password, $user->data->user_pass, $user->ID)){
+            // let WP handle this
+            return;
+        }
         if(!$this->IsUserPasswordOld($user)){
-            if(!wp_check_password($password, $user->data->user_pass, $user->ID)){
-                // let WP handle this
-                return;
-            }
+            return;
         }
         ?>
         <p>
@@ -168,21 +173,21 @@ class WpPasswordPolicyManager
             <label for="user_pass_vfy"><?php _e('Verify Password') ?><br />
                 <input type="password" name="user_pass_vfy" id="user_pass_vfy" class="input" value="<?php echo ''; ?>" size="25" /></label>
         </p>
-        <script type="text/javascript">
-            window.wppm_ModifyForm = <?php echo json_encode(array(
-                'CurrentUserLogin' => $username,
-                'CurrentUserPass' => $password,
-                'TextOldPass' => __('Old Password'),
-                'BtnChangeAndLogin' => __('Change & Log in'),
-                'NewPasswordRules' => $this->GetPasswordRules(),
-                'NewPassRulesHead' => __('New password must...'),
-                'NewPassRulesFoot' => __('WordPress Password Policies by')
-                    . '<br/><a href="http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/" target="_blank">'
-                        . __('WP Password Policy Manager')
-                    . '</a>'
-            )); ?>;
-        </script><?php
+        <?php
+
         wp_enqueue_script('front-js', $this->GetBaseUrl().'js/front.js', array('jquery'), rand(1,1234));
+        wp_localize_script('front-js', 'wppm_ModifyForm', array(
+            'CurrentUserLogin' => $username,
+            'CurrentUserPass' => $password,
+            'TextOldPass' => __('Old Password'),
+            'BtnChangeAndLogin' => __('Change & Log in'),
+            'NewPasswordRules' => $this->GetPasswordRules(),
+            'NewPassRulesHead' => __('New password must...'),
+            'NewPassRulesFoot' => __('WordPress Password Policies by')
+                . '<br/><a href="http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/" target="_blank">'
+                    . __('WP Password Policy Manager')
+                . '</a>'
+        ));
     }
 
     protected $shouldModify = false;
@@ -262,6 +267,15 @@ class WpPasswordPolicyManager
         $rules = $this->GetPasswordRules();
         ?>
         <table class="form-table">
+            <?php if($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD) && !$this->UserCanSkipOldPwdPolicy()) { ?>
+            <tr>
+                <th><label for="wppmoldpass"><?php _e('Current Password') ;?></label></th>
+                <td>
+                    <input type="password" name="wppmoldpass" id="wppmoldpass" class="regular-text" size="16" value="" autocomplete="off"><br>
+                    <span class="description"><?php _e('Type your current password to be able to change your password.'); ?></span>
+                </td>
+            </tr>
+            <?php } ?>
             <tr>
                 <th><label><?php _e('New password must') ;?></label></th>
                 <td>
@@ -285,7 +299,11 @@ class WpPasswordPolicyManager
     public function ValidateUserProfilePage($errors, $update = null, $user = null){
         $pass1 = (isset($_REQUEST['pass1']) ? $_REQUEST['pass1'] : '');
         $pass2 = (isset($_REQUEST['pass2']) ? $_REQUEST['pass2'] : '');
-        return $this->__validateProfile($errors, $user, $pass1, $pass2);
+        $oldpass = '';
+        if($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD) && !$this->UserCanSkipOldPwdPolicy($user)) {
+            $oldpass = (isset($_REQUEST['wppmoldpass']) ? $_REQUEST['wppmoldpass'] : '');
+        }
+        return $this->__validateProfile($errors, $user, $pass1, $pass2, $oldpass);
     }
 
     /**
@@ -297,7 +315,7 @@ class WpPasswordPolicyManager
      * @param $pass2
      * @return mixed
      */
-    protected function __validateProfile($errors, $user, $pass1, $pass2){
+    protected function __validateProfile($errors, $user, $pass1, $pass2, $oldpass='') {
         if($user){
             if(! isset($user->ID)){
                 return $errors;
@@ -324,6 +342,12 @@ class WpPasswordPolicyManager
                     $errors->add('expired_password', '<strong>ERROR</strong>: Both new passwords must match.');
                     return $errors;
                 }
+                $validateOldPass = ($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD) && !$this->UserCanSkipOldPwdPolicy());
+                if($validateOldPass && empty($oldpass)){
+                    $errors->add('expired_password', '<strong>ERROR</strong>: Please enter the current password in the Current Password field.');
+                    return $errors;
+                }
+
                 // get the current pass
                 $crtPwd = $userInfo->user_pass;
                 if(wp_check_password($pass1, $crtPwd, $user->ID)){
@@ -365,6 +389,12 @@ class WpPasswordPolicyManager
                         return $errors;
                     }
                 }
+                if($validateOldPass) {
+                    if (!wp_check_password($oldpass, $crtPwd, $user->ID)) {
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: Current password is incorrect.'));
+                        return $errors;
+                    }
+                }
                 $_nMaxSamePass = $this->GetMaxSamePass();
                 if($_nMaxSamePass){
                     if($this->_pwdHasBeenUsed($user->ID, $pass1)){
@@ -376,13 +406,6 @@ class WpPasswordPolicyManager
                 }
                 else {self::ClearUserPrevPwds($user->ID); }
 
-                // if this is not own profile - reset & expire pwd
-//                $crtUserID = get_current_user_id();
-//                if($crtUserID != $user->ID){
-//                    $this->SetGlobalOption(self::OPT_USER_RST_PWD . '_' . $user->ID, true);
-//                    update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp'));
-//                }
-                //----
                 $this->SetGlobalOption(self::OPT_USER_RST_PWD . '_' . $user->ID, false);
                 update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp')+(strtotime($this->GetPasswordTtl())));
             }
@@ -391,19 +414,10 @@ class WpPasswordPolicyManager
     }
 
     public function ModifyWpResetForm() {
-        $fp = $this->GetBaseDir().'js/wppmpp.tmp.js';
-        if(is_file($fp)){
-            if(!@unlink($fp)){
-                file_put_contents($fp,'');
-            }
-        }
         wp_enqueue_style('wppm-reset-css', $this->GetBaseUrl() . 'css/wppm-reset.css', null, filemtime($this->GetBaseDir() . 'css/wppm-reset.css'));
-        wp_enqueue_script('wppm-reset-js', $this->GetBaseUrl() . 'js/reset.js', array('jquery'), filemtime($this->GetBaseDir() . 'js/reset.js'));
-        //#!-- Because we cannot just echo the script into the page, we're creating a temp js file to hold this setting
-        //#!-- and include it into the page using WP's functionality.
-        //#!-- this temp js file will be overwritten each time the password policies change
-        $str = 'window.wppm_ModifyForm=';
-        $str .= json_encode(array(
+        wp_enqueue_script('wppm-reset-js', $this->GetBaseUrl() . 'js/reset.js', array('jquery'), filemtime($this->GetBaseDir() . 'js/reset.js'), true);
+
+        wp_localize_script('wppm-reset-js', 'wppm_ModifyForm', array(
             'NewPasswordRules' => $this->GetPasswordRules(),
             'NewPassRulesHead' => __('New password must...'),
             'NewPassRulesFoot' => __('WordPress Password Policies by')
@@ -411,9 +425,6 @@ class WpPasswordPolicyManager
                 . __('WP Password Policy Manager')
                 . '</a>'
         ));
-        $str .= ';';
-        file_put_contents($this->GetBaseDir().'js/wppmpp.tmp.js', $str);
-        wp_enqueue_script('wppm-pwd-policies-js', $this->GetBaseUrl() . 'js/wppmpp.tmp.js', array('jquery'), filemtime($this->GetBaseDir() . 'js/wppmpp.tmp.js'));
     }
 
     public function ValidatePasswordReset( WP_Error $errors, $user ) {
@@ -588,6 +599,16 @@ class WpPasswordPolicyManager
 // </editor-fold>
 
     // <editor-fold desc="Misc Functionality">
+
+    public function UserCanSkipOldPwdPolicy(){
+        $user = wp_get_current_user();
+        if($this->IsUserExemptFromPolicies($user)){
+            return true;
+        }
+        // If this is not his profile & is admin
+        return user_can($user->ID, 'manage_options');
+    }
+
     /**
      * @return string Password policy time to live as a string.
      */
@@ -700,6 +721,7 @@ class WpPasswordPolicyManager
         $this->SetPolicyState(self::POLICY_MIXCASE, $this->IsPostIdent('cpt'));
         $this->SetPolicyState(self::POLICY_NUMBERS, $this->IsPostIdent('num'));
         $this->SetPolicyState(self::POLICY_SPECIAL, $this->IsPostIdent('spc'));
+        $this->SetPolicyState(self::POLICY_OLDPASSWORD, $this->IsPostIdent('opw'));
         $this->SetExemptTokens(isset($_REQUEST['ExemptTokens']) ? $_REQUEST['ExemptTokens'] : array());
         if($this->IsPostIdent('msp'))
             $this->SetMaxSamePass((int)$this->GetPostIdent('msp'));
@@ -856,6 +878,19 @@ class WpPasswordPolicyManager
                                 <input name="<?php $this->EchoIdent('spc'); ?>" type="checkbox" id="<?php $this->EchoIdent('spc'); ?>"
                                        value="1"<?php if($this->IsPolicyEnabled(self::POLICY_SPECIAL))echo ' checked="checked"'; ?>/>
                                 <?php _e('Password must contain special characters (eg: <code>.,!#$_+</code>).'); ?>
+                            </label>
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><label for="<?php $this->EchoIdent('opw'); ?>"><?php _e('Current Password Policy'); ?></label></th>
+                    <td>
+                        <fieldset>
+                            <legend class="screen-reader-text"><span><?php _e('Current Password Policy'); ?></span></legend>
+                            <label for="<?php $this->EchoIdent('opw'); ?>">
+                                <input name="<?php $this->EchoIdent('opw'); ?>" type="checkbox" id="<?php $this->EchoIdent('opw'); ?>"
+                                       value="1"<?php if($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD))echo ' checked="checked"'; ?>/>
+                                <?php _e('When changing password on the profile page, the user must supply the current password.'); ?>
                             </label>
                         </fieldset>
                     </td>

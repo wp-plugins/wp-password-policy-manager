@@ -1,12 +1,12 @@
 === WP Password Policy Manager ===
-Contributors: WPWhiteSecurity
+Contributors: WPWhiteSecurity, wpkytten
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=abela%2erobert%40gmail%2ecom
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong password, strong wordpress password, authentication, password security, password expire, strong wordpress password plugin
 Requires at least: 3.6.0
 Tested up to: 4.0.1
-Stable tag: 0.4
+Stable tag: 0.5
 
 Configure WordPress password policies to ensure all WordPress users use strong passwords and improve the security of your WordPress.
 
@@ -39,6 +39,9 @@ As a WordPress administrators you can configure any of the below password polici
 > <strong>Password History Policy</strong><br>
 > This policy allows you to specify how many passwords should the plugin remember so WordPress users do not use the same password. For example if you specify 8 the user can reuse an old password on the ninth time his password is changed.
 >
+> <strong>Current Password Policy</strong><br>
+> When you enable this policy WordPress users have to specify the current password to be able to change the password from the WordPress profile page.
+>
 > <strong>Note:<strong>WP Password Policy Manager stored users' passwords the same way WordPress stores them, hence it is secure.
 
 = Reset All WordPress Users Password with One Click =
@@ -46,6 +49,9 @@ In case your WordPress has been hacked or need to reset all WordPress users' pas
 
 = Keep Track of All WordPress Users Activity on WordPress =
 Another way to ensure WordPress security is to have full control of your WordPress by keeping an audit log of all changes that happen on your [WordPress with WP Security Audit Log](https://wordpress.org/plugins/wp-security-audit-log/) plugin.
+
+= Other Noteworthy Features and Options =
+* Built-in policies do not allow for a password to be the same as WordPress user
 
 = Plugin Newsletter =
 To keep yourself updated with what is new and updated in our WordPress security plugins please subscribe to the [WP White Security Plugins Newsletter](http://eepurl.com/Jn9sP).
@@ -75,11 +81,20 @@ If a WordPress user's password is expired, the user will be notified and asked t
 
 == Changelog ==
 
-
+= 0.5 (2014-12-8) =
+* **New Features**
+	* Administrators can now enforce a user to specify the current password in profile page when changing the password - Administrators are exempt from this requirement so they can easily reset other users' password. Thanks to [Jens Nilson](https://profiles.wordpress.org/jensnilsson) for recommending this feature and for helping in developing it.
+	
+* **Improvements**
+	* Removed the need to write to /js/wppmpp.tmp.js and using built-in wp_localize_script. Update by [Jens Nilson](https://profiles.wordpress.org/jensnilsson)
+	
+* **Bug Fixes**
+	* Fixed an issue when user was redirected to password reset page when an incorrect user was specified
+	* Fixed 
 = 0.4 (2014-12-1) =
 * **Bug Fix**
 	* Fixed an issue where the password was not being reset properly when changed by the admin on a user's profile page
-
+	* Fixed an issue where user who entered incorrect password and had an expired password he was still automatically redirected to password reset page
 
 = 0.3 (2014-11-24) =
 * **New Plugin Features**

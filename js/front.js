@@ -1,7 +1,6 @@
 jQuery(document).ready(function(){
-
-    if(window.wppm_ModifyForm){
-        var d = window.wppm_ModifyForm;
+    if(wppm_ModifyForm){
+        var d = wppm_ModifyForm;
 
         // update form fields
         jQuery('#user_login').val('').val(d.CurrentUserLogin).attr('readonly', true);
