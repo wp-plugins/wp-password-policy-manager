@@ -4,7 +4,8 @@ Plugin Name: WordPress Password Policy Manager
 Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wordpress-password-policy-manager-plugin/
 Description: WordPress Password Policy Manager allows WordPress administrators to configure password policies for WordPress users to use strong passwords.
 Author: WP White Security
-Version: 0.5
+Version: 0.6
+Text Domain: wp-password-policy-manager
 Author URI: http://www.wpwhitesecurity.com/
 License: GPL2
 
@@ -104,23 +105,23 @@ class WpPasswordPolicyManager
 
     protected function GetPasswordRules(){
         $rules = array(
-            __('not be the same as your username'),
+            __('not be the same as your username', 'wp-password-policy-manager'),
         );
         $_nMaxSamePass = $this->GetMaxSamePass();
         if ($_nMaxSamePass) {
-            $rules[] = sprintf(__('not be one of the previous %d used passwords.'), $_nMaxSamePass);
+            $rules[] = sprintf(__('not be one of the previous %d used passwords.', 'wp-password-policy-manager'), $_nMaxSamePass);
         } else {
-            $rules[] = __('not be the same as the previous one');
+            $rules[] = __('not be the same as the previous one', 'wp-password-policy-manager');
         }
 
         if (!!($c = $this->GetPasswordLen()))
-            $rules[] = sprintf(__('be at least %d characters long'), $c);
+            $rules[] = sprintf(__('be at least %d characters long', 'wp-password-policy-manager'), $c);
         if ($this->IsPolicyEnabled(self::POLICY_MIXCASE))
-            $rules[] = sprintf(__('contain mixed case characters'));
+            $rules[] = sprintf(__('contain mixed case characters', 'wp-password-policy-manager'));
         if ($this->IsPolicyEnabled(self::POLICY_NUMBERS))
-            $rules[] = sprintf(__('contain numeric digits'));
+            $rules[] = sprintf(__('contain numeric digits', 'wp-password-policy-manager'));
         if ($this->IsPolicyEnabled(self::POLICY_SPECIAL))
-            $rules[] = sprintf(__('contain special characters'));
+            $rules[] = sprintf(__('contain special characters', 'wp-password-policy-manager'));
         return $rules;
     }
 
@@ -166,11 +167,11 @@ class WpPasswordPolicyManager
         }
         ?>
         <p>
-            <label for="user_pass_new"><?php _e('New Password') ?><br />
+            <label for="user_pass_new"><?php _e('New Password', 'wp-password-policy-manager') ?><br />
                 <input type="password" name="user_pass_new" id="user_pass_new" class="input" value="<?php echo ''; ?>" size="25" /></label>
         </p>
         <p>
-            <label for="user_pass_vfy"><?php _e('Verify Password') ?><br />
+            <label for="user_pass_vfy"><?php _e('Verify Password', 'wp-password-policy-manager') ?><br />
                 <input type="password" name="user_pass_vfy" id="user_pass_vfy" class="input" value="<?php echo ''; ?>" size="25" /></label>
         </p>
         <?php
@@ -179,13 +180,13 @@ class WpPasswordPolicyManager
         wp_localize_script('front-js', 'wppm_ModifyForm', array(
             'CurrentUserLogin' => $username,
             'CurrentUserPass' => $password,
-            'TextOldPass' => __('Old Password'),
-            'BtnChangeAndLogin' => __('Change & Log in'),
+            'TextOldPass' => __('Old Password', 'wp-password-policy-manager'),
+            'BtnChangeAndLogin' => __('Change & Log in', 'wp-password-policy-manager'),
             'NewPasswordRules' => $this->GetPasswordRules(),
-            'NewPassRulesHead' => __('New password must...'),
-            'NewPassRulesFoot' => __('WordPress Password Policies by')
+            'NewPassRulesHead' => __('New password must...', 'wp-password-policy-manager'),
+            'NewPassRulesFoot' => __('WordPress Password Policies by', 'wp-password-policy-manager')
                 . '<br/><a href="http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/" target="_blank">'
-                    . __('WP Password Policy Manager')
+                    . __('WP Password Policy Manager', 'wp-password-policy-manager')
                 . '</a>'
         ));
     }
@@ -193,7 +194,7 @@ class WpPasswordPolicyManager
     protected $shouldModify = false;
     public function ValidateLoginForm($user, $password){
         if(!($user instanceof WP_User)){
-            return new WP_Error('expired_password', __('Invalid Request'));
+            return new WP_Error('expired_password', __('Invalid Request', 'wp-password-policy-manager'));
         }
         if($this->IsUserExemptFromPolicies($user)){
             return $user;
@@ -211,33 +212,33 @@ class WpPasswordPolicyManager
             // Apply password policies
             if(isset($_REQUEST['user_pass_new']) && isset($_REQUEST['user_pass_vfy'])){
                 if(!trim($_REQUEST['user_pass_new']) || !trim($_REQUEST['user_pass_vfy']))
-                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: The new password cannot be empty.'));
+                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: The new password cannot be empty.', 'wp-password-policy-manager'));
                 if($_REQUEST['user_pass_new'] != $_REQUEST['user_pass_vfy'])
-                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: Both new passwords must match.'));
+                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: Both new passwords must match.', 'wp-password-policy-manager'));
                 if(wp_check_password($_REQUEST['user_pass_new'], $user->data->user_pass, $user->ID))
-                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the old one.'));
+                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the old one.', 'wp-password-policy-manager'));
                 if($_REQUEST['user_pass_new'] == $user->user_login)
-                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the username.'));
+                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the username.', 'wp-password-policy-manager'));
                 if($_REQUEST['user_pass_new'] == $user->user_email)
-                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the email.'));
+                    return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the email.', 'wp-password-policy-manager'));
                 if(($c = $this->GetPasswordLen()) != 0)
                     if(strlen($_REQUEST['user_pass_new']) < $c)
-                        return new WP_Error('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.'), $c));
+                        return new WP_Error('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.', 'wp-password-policy-manager'), $c));
                 if($this->IsPolicyEnabled(self::POLICY_MIXCASE))
                     if(strtolower($_REQUEST['user_pass_new']) == $_REQUEST['user_pass_new'])
-                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.'));
+                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.', 'wp-password-policy-manager'));
                 if($this->IsPolicyEnabled(self::POLICY_NUMBERS))
                     if(!preg_match('/[0-9]/', $_REQUEST['user_pass_new']))
-                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.'));
+                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.', 'wp-password-policy-manager'));
                 if($this->IsPolicyEnabled(self::POLICY_SPECIAL))
                     if(!preg_match('/[_\W]/', $_REQUEST['user_pass_new']))
-                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.'));
+                        return new WP_Error('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.', 'wp-password-policy-manager'));
                 // update user passwords, if the policy applies
                 $_nMaxSamePass = $this->GetMaxSamePass();
                 if($_nMaxSamePass){
                     if($this->_pwdHasBeenUsed($user->ID, $_REQUEST['user_pass_new'])){
                         return new WP_Error('expired_password',
-                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.'), $_nMaxSamePass));
+                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.', 'wp-password-policy-manager'), $_nMaxSamePass));
                     }
                     $this->_addPwdToList($user->ID, $_REQUEST['user_pass_new']);
                 }
@@ -257,7 +258,7 @@ class WpPasswordPolicyManager
                     $diff = __('1 minute');
                 }
                 else { $diff = human_time_diff(strtotime($this->GetPasswordTtl(), $this->GetPasswordLastModTime($user->ID)), current_time('timestamp')); }
-                return new WP_Error('expired_password', sprintf(__('<strong>ERROR</strong>: The password you entered expired %s ago.'), $diff));
+                return new WP_Error('expired_password', sprintf(__('<strong>ERROR</strong>: The password you entered expired %s ago.', 'wp-password-policy-manager'), $diff));
             }
         }
         return $user;
@@ -269,15 +270,15 @@ class WpPasswordPolicyManager
         <table class="form-table">
             <?php if($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD) && !$this->UserCanSkipOldPwdPolicy()) { ?>
             <tr>
-                <th><label for="wppmoldpass"><?php _e('Current Password') ;?></label></th>
+                <th><label for="wppmoldpass"><?php _e('Current Password', 'wp-password-policy-manager') ;?></label></th>
                 <td>
                     <input type="password" name="wppmoldpass" id="wppmoldpass" class="regular-text" size="16" value="" autocomplete="off"><br>
-                    <span class="description"><?php _e('Type your current password to be able to change your password.'); ?></span>
+                    <span class="description"><?php _e('Type your current password to be able to change your password.', 'wp-password-policy-manager'); ?></span>
                 </td>
             </tr>
             <?php } ?>
             <tr>
-                <th><label><?php _e('New password must') ;?></label></th>
+                <th><label><?php _e('New password must', 'wp-password-policy-manager') ;?></label></th>
                 <td>
                     <div id="wppmUserProfilePwdRulesContainer">
                         <ul style="list-style: disc inside; margin-top: 5px;">
@@ -285,9 +286,9 @@ class WpPasswordPolicyManager
                         </ul>
                         <div style="width: 240px;">
                             <p style="text-align: center;"><?php echo
-                                    __('WordPress Password Policies by')
+                                    __('WordPress Password Policies by', 'wp-password-policy-manager')
                                     . '<br/><a href="http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/" target="_blank">'
-                                    . __('WP Password Policy Manager'). '</a>'
+                                    . __('WP Password Policy Manager', 'wp-password-policy-manager'). '</a>'
                                 ?></p>
                         </div>
                     </div>
@@ -335,63 +336,63 @@ class WpPasswordPolicyManager
             if((isset($pass1) && isset($pass2)) && (!empty($pass1) && !empty($pass2)))
             {
                 if(empty($pass1) || empty($pass2)){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: The new password cannot be empty.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: The new password cannot be empty.', 'wp-password-policy-manager');
                     return $errors;
                 }
                 if($pass1 <> $pass2){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: Both new passwords must match.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: Both new passwords must match.', 'wp-password-policy-manager');
                     return $errors;
                 }
                 $validateOldPass = ($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD) && !$this->UserCanSkipOldPwdPolicy());
                 if($validateOldPass && empty($oldpass)){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: Please enter the current password in the Current Password field.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: Please enter the current password in the Current Password field.', 'wp-password-policy-manager');
                     return $errors;
                 }
 
                 // get the current pass
                 $crtPwd = $userInfo->user_pass;
                 if(wp_check_password($pass1, $crtPwd, $user->ID)){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the old one.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the old one.', 'wp-password-policy-manager');
                     return $errors;
                 }
                 // new password cannot be the same as the username
                 if($pass1 == $userInfo->user_login){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the username.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the username.', 'wp-password-policy-manager');
                     return $errors;
                 }
                 // new password cannot be the same as the email
                 if($pass1 == $userInfo->user_email){
-                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the email.');
+                    $errors->add('expired_password', '<strong>ERROR</strong>: New password cannot be the same as the email.', 'wp-password-policy-manager');
                     return $errors;
                 }
                 // Apply password policies
                 if(($c = $this->GetPasswordLen()) != 0) {
                     if (strlen($pass1) < $c) {
-                        $errors->add('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.'), $c));
+                        $errors->add('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.', 'wp-password-policy-manager'), $c));
                         return $errors;
                     }
                 }
                 if($this->IsPolicyEnabled(self::POLICY_MIXCASE)) {
                     if (strtolower($pass1) == $pass1) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
                 if($this->IsPolicyEnabled(self::POLICY_NUMBERS)) {
                     if (!preg_match('/[0-9]/', $pass1)) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
                 if($this->IsPolicyEnabled(self::POLICY_SPECIAL)) {
                     if (!preg_match('/[_\W]/', $pass1)) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
                 if($validateOldPass) {
                     if (!wp_check_password($oldpass, $crtPwd, $user->ID)) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: Current password is incorrect.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: Current password is incorrect.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
@@ -399,7 +400,7 @@ class WpPasswordPolicyManager
                 if($_nMaxSamePass){
                     if($this->_pwdHasBeenUsed($user->ID, $pass1)){
                         $errors->add('expired_password',
-                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.'), $_nMaxSamePass));
+                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.', 'wp-password-policy-manager'), $_nMaxSamePass));
                         return $errors;
                     }
                     $this->_addPwdToList($user->ID, $pass1);
@@ -419,10 +420,10 @@ class WpPasswordPolicyManager
 
         wp_localize_script('wppm-reset-js', 'wppm_ModifyForm', array(
             'NewPasswordRules' => $this->GetPasswordRules(),
-            'NewPassRulesHead' => __('New password must...'),
-            'NewPassRulesFoot' => __('WordPress Password Policies by')
+            'NewPassRulesHead' => __('New password must...', 'wp-password-policy-manager'),
+            'NewPassRulesFoot' => __('WordPress Password Policies by', 'wp-password-policy-manager')
                 . '<br/><a href="http://www.wpwhitesecurity.com/wordpress-security-plugins/wp-password-policy-manager/" target="_blank">'
-                . __('WP Password Policy Manager')
+                . __('WP Password Policy Manager', 'wp-password-policy-manager')
                 . '</a>'
         ));
     }
@@ -431,15 +432,15 @@ class WpPasswordPolicyManager
         $rm = strtoupper($_SERVER['REQUEST_METHOD']);
         if ('POST' == $rm) {
             if (!isset($_POST['pass1']) || !isset($_POST['pass2'])) {
-                $errors->add('expired_password', __('The form is not valid. Please refresh the page and try again.'));
+                $errors->add('expired_password', __('The form is not valid. Please refresh the page and try again.', 'wp-password-policy-manager'));
                 return $errors;
             }
             if (empty($_POST['pass1'])) {
-                $errors->add('expired_password', __('Please provide your new password.'));
+                $errors->add('expired_password', __('Please provide your new password.', 'wp-password-policy-manager'));
                 return $errors;
             }
             if (empty($_POST['pass2'])) {
-                $errors->add('expired_password', __('Please confirm your new password.'));
+                $errors->add('expired_password', __('Please confirm your new password.', 'wp-password-policy-manager'));
                 return $errors;
             }
 
@@ -447,13 +448,13 @@ class WpPasswordPolicyManager
             $p2 = trim(strip_tags($_POST['pass2']));
 
             if ($password != $p2) {
-                $errors->add('expired_password', __('Passwords must match.'));
+                $errors->add('expired_password', __('Passwords must match.', 'wp-password-policy-manager'));
                 return $errors;
             }
 
             //-- new password must not be the same as the current one
             if (wp_check_password($password, $user->data->user_pass, $user->ID)) {
-                $errors->add('expired_password', __('The new password cannot be the same as the current one.'));
+                $errors->add('expired_password', __('The new password cannot be the same as the current one.', 'wp-password-policy-manager'));
                 return $errors;
             }
             //-- Enforce password policies
@@ -463,34 +464,34 @@ class WpPasswordPolicyManager
                 $this->CurrentUserLogin = $user->user_login;
 
                 if ($password == $user->user_login) {
-                    $errors->add('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the username.'));
+                    $errors->add('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the username.', 'wp-password-policy-manager'));
                     return $errors;
                 }
                 if ($password == $user->user_email) {
-                    $errors->add('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the email.'));
+                    $errors->add('expired_password', __('<strong>ERROR</strong>: New password cannot be the same as the email.', 'wp-password-policy-manager'));
                     return $errors;
                 }
                 if (($c = $this->GetPasswordLen()) != 0) {
                     if (strlen($password) < $c) {
-                        $errors->add('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.'), $c));
+                        $errors->add('expired_password', sprintf(__('<strong>ERROR</strong>: New password must contain at least %d characters.', 'wp-password-policy-manager'), $c));
                         return $errors;
                     }
                 }
                 if ($this->IsPolicyEnabled(self::POLICY_MIXCASE)) {
                     if (strtolower($password) == $password) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain both uppercase and lowercase characters.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
                 if ($this->IsPolicyEnabled(self::POLICY_NUMBERS)) {
                     if (!preg_match('/[0-9]/', $password)) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain numbers.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
                 if ($this->IsPolicyEnabled(self::POLICY_SPECIAL)) {
                     if (!preg_match('/[_\W]/', $password)) {
-                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.'));
+                        $errors->add('expired_password', __('<strong>ERROR</strong>: New password must contain special characters.', 'wp-password-policy-manager'));
                         return $errors;
                     }
                 }
@@ -500,7 +501,7 @@ class WpPasswordPolicyManager
                 if ($_nMaxSamePass) {
                     if ($this->_pwdHasBeenUsed($user->ID, $password)) {
                         $errors->add('expired_password',
-                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.'), $_nMaxSamePass));
+                            sprintf(__('<strong>ERROR</strong>: New password must not be one of the previous %d used passwords.', 'wp-password-policy-manager'), $_nMaxSamePass));
                         return $errors;
                     }
                     $this->_addPwdToList($user->ID, $password);
@@ -633,7 +634,7 @@ class WpPasswordPolicyManager
             $now = current_time('timestamp');
             $time = strtotime($newTtl, $now);
             if($time === false || $time < $now)
-                throw new Exception(__('Password policy expiration time is not valid.'));
+                throw new Exception(__('Password policy expiration time is not valid.', 'wp-password-policy-manager'));
         }else $newTtl = '';
         $this->SetGlobalOption(self::OPT_NAME_TTL, $newTtl);
     }
@@ -738,9 +739,9 @@ class WpPasswordPolicyManager
             $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
             $message = '<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body>';
-            $message .= sprintf(__('<p>Your password for <strong>%s</strong> has been reset.</p>'), $blogname) . "\r\n\r\n";
-            $message .= sprintf(__('<p>New Password: <strong>%s</strong></p>'), $new_password) . "\r\n\r\n";
-            $message .= sprintf(__('<p>Please log in and change your password:')) . "\r\n";
+            $message .= sprintf(__('<p>Your password for <strong>%s</strong> has been reset.</p>', 'wp-password-policy-manager'), $blogname) . "\r\n\r\n";
+            $message .= sprintf(__('<p>New Password: <strong>%s</strong></p>', 'wp-password-policy-manager'), $new_password) . "\r\n\r\n";
+            $message .= sprintf(__('<p>Please log in and change your password:', 'wp-password-policy-manager')) . "\r\n";
             $message .= wp_login_url() . "</p>\r\n";
             $message .= '</body></html>';
             $result = self::SendNotificationEmail($user->user_email, $message);
@@ -755,7 +756,7 @@ class WpPasswordPolicyManager
         $headers = sprintf('From: %s <%s>', get_bloginfo('name'), get_bloginfo('admin_email'))."\r\n";
         $headers .= sprintf('Reply-to: %s <%s>', get_bloginfo('name'), get_bloginfo('admin_email'))."\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        $subject = 'Password has been reset';
+        $subject = __('Password has been reset', 'wp-password-policy-manager');
         //@see: http://codex.wordpress.org/Function_Reference/wp_mail
         add_filter('wp_mail_content_type', array($this, '_set_html_content_type'));
         $result = wp_mail($emailAddress, $subject, $message, $headers);
@@ -779,7 +780,7 @@ class WpPasswordPolicyManager
     public function ManageWpOptions(){
         // control access to plugin
         if (!$this->IsManagingAdmin()) {
-            wp_die(__('You do not have sufficient permissions to access this page.'));
+            wp_die(__('You do not have sufficient permissions to access this page.', 'wp-password-policy-manager'));
         }
         // update submitted settings
         if(isset($_POST) && count($_POST)){
@@ -787,17 +788,17 @@ class WpPasswordPolicyManager
                 switch(true){
                     case isset($_POST[self::DEF_PFX.'_snt']):
                         $this->UpdateWpOptions();
-                        ?><div class="updated"><p><strong><?php _e('Settings saved.'); ?></strong></p></div><?php
+                        ?><div class="updated"><p><strong><?php _e('Settings saved.', 'wp-password-policy-manager'); ?></strong></p></div><?php
                         break;
                     case isset($_POST[self::DEF_PFX.'_rst']):
                         $this->ResetWpPasswords();
-                        ?><div class="updated"><p><strong><?php _e('All passwords have been reset.'); ?></strong></p></div><?php
+                        ?><div class="updated"><p><strong><?php _e('All passwords have been reset.', 'wp-password-policy-manager'); ?></strong></p></div><?php
                         break;
                     default:
-                        throw new Exception('Unexpected form submission content.');
+                        throw new Exception('Unexpected form submission content.', 'wp-password-policy-manager');
                 }
             } catch (Exception $ex) {
-                ?><div class="error"><p><strong><?php _e(__('Error').': '.$ex->getMessage()); ?></strong></p></div><?php
+                ?><div class="error"><p><strong><?php _e(__('Error', 'wp-password-policy-manager').': '.$ex->getMessage()); ?></strong></p></div><?php
             }
         }
         // display settings page
@@ -820,16 +821,16 @@ class WpPasswordPolicyManager
             <table class="form-table">
                 <tbody>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('ttl'); ?>"><?php _e('Password Expiration Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('ttl'); ?>"><?php _e('Password Expiration Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <input type="text" id="<?php $this->EchoIdent('ttl'); ?>" name="<?php $this->EchoIdent('ttl'); ?>"
                                value="<?php echo esc_attr($this->GetPasswordTtl()); ?>" size="20" class="regular-text ltr">
-                        <p class="description"><?php _e('Examples: <code>5 days</code> <code>20 days 6 hours</code> <code>3 weeks</code>'); ?></p>
-                        <?php _e('Leave blank to disable Password Expiry policy.'); ?>
+                        <p class="description"><?php _e('Examples: <code>5 days</code> <code>20 days 6 hours</code> <code>3 weeks</code>', 'wp-password-policy-manager'); ?></p>
+                        <?php _e('Leave blank to disable Password Expiry policy.', 'wp-password-policy-manager'); ?>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('len'); ?>"><?php _e('Password Length Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('len'); ?>"><?php _e('Password Length Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <select type="text" id="<?php $this->EchoIdent('len'); ?>" name="<?php $this->EchoIdent('len'); ?>"><?php
                             $curr = $this->GetPasswordLen();
@@ -839,64 +840,64 @@ class WpPasswordPolicyManager
                                 <?php echo ($value == 0 ? '' : $value); ?>
                                 </option><?php
                             }
-                            ?></select> <?php _e('characters'); ?><br/>
-                        <?php _e('Leave blank to disable Password Length policy.'); ?>
+                            ?></select> <?php _e('characters', 'wp-password-policy-manager'); ?><br/>
+                        <?php _e('Leave blank to disable Password Length policy.', 'wp-password-policy-manager'); ?>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('cpt'); ?>"><?php _e('Mixed Case Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('cpt'); ?>"><?php _e('Mixed Case Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
-                            <legend class="screen-reader-text"><span><?php _e('Mixed Case Policy'); ?></span></legend>
+                            <legend class="screen-reader-text"><span><?php _e('Mixed Case Policy', 'wp-password-policy-manager'); ?></span></legend>
                             <label for="<?php $this->EchoIdent('cpt'); ?>">
                                 <input name="<?php $this->EchoIdent('cpt'); ?>" type="checkbox" id="<?php $this->EchoIdent('cpt'); ?>"
                                        value="1"<?php if($this->IsPolicyEnabled(self::POLICY_MIXCASE))echo ' checked="checked"'; ?>/>
-                                <?php _e('Password must contain a mix of uppercase and lowercase characters.'); ?>
+                                <?php _e('Password must contain a mix of uppercase and lowercase characters.', 'wp-password-policy-manager'); ?>
                             </label>
                         </fieldset>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('num'); ?>"><?php _e('Numeric Digits Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('num'); ?>"><?php _e('Numeric Digits Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
-                            <legend class="screen-reader-text"><span><?php _e('Numeric Digits Policy'); ?></span></legend>
+                            <legend class="screen-reader-text"><span><?php _e('Numeric Digits Policy', 'wp-password-policy-manager'); ?></span></legend>
                             <label for="<?php $this->EchoIdent('num'); ?>">
                                 <input name="<?php $this->EchoIdent('num'); ?>" type="checkbox" id="<?php $this->EchoIdent('num'); ?>"
                                        value="1"<?php if($this->IsPolicyEnabled(self::POLICY_NUMBERS))echo ' checked="checked"'; ?>/>
-                                <?php _e('Password must contain numeric digits (<code>0-9</code>).'); ?>
+                                <?php _e('Password must contain numeric digits (<code>0-9</code>).', 'wp-password-policy-manager'); ?>
                             </label>
                         </fieldset>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('spc'); ?>"><?php _e('Special Characters Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('spc'); ?>"><?php _e('Special Characters Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
-                            <legend class="screen-reader-text"><span><?php _e('Special Characters Policy'); ?></span></legend>
+                            <legend class="screen-reader-text"><span><?php _e('Special Characters Policy', 'wp-password-policy-manager'); ?></span></legend>
                             <label for="<?php $this->EchoIdent('spc'); ?>">
                                 <input name="<?php $this->EchoIdent('spc'); ?>" type="checkbox" id="<?php $this->EchoIdent('spc'); ?>"
                                        value="1"<?php if($this->IsPolicyEnabled(self::POLICY_SPECIAL))echo ' checked="checked"'; ?>/>
-                                <?php _e('Password must contain special characters (eg: <code>.,!#$_+</code>).'); ?>
+                                <?php _e('Password must contain special characters (eg: <code>.,!#$_+</code>).', 'wp-password-policy-manager'); ?>
                             </label>
                         </fieldset>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="<?php $this->EchoIdent('opw'); ?>"><?php _e('Current Password Policy'); ?></label></th>
+                    <th scope="row"><label for="<?php $this->EchoIdent('opw'); ?>"><?php _e('Current Password Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
-                            <legend class="screen-reader-text"><span><?php _e('Current Password Policy'); ?></span></legend>
+                            <legend class="screen-reader-text"><span><?php _e('Current Password Policy', 'wp-password-policy-manager'); ?></span></legend>
                             <label for="<?php $this->EchoIdent('opw'); ?>">
                                 <input name="<?php $this->EchoIdent('opw'); ?>" type="checkbox" id="<?php $this->EchoIdent('opw'); ?>"
                                        value="1"<?php if($this->IsPolicyEnabled(self::POLICY_OLDPASSWORD))echo ' checked="checked"'; ?>/>
-                                <?php _e('When changing password on the profile page, the user must supply the current password.'); ?>
+                                <?php _e('When changing password on the profile page, the user must supply the current password.', 'wp-password-policy-manager'); ?>
                             </label>
                         </fieldset>
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th><label for="<?php $this->EchoIdent('msp'); ?>"><?php _e('Password History Policy'); ?></label></th>
+                    <th><label for="<?php $this->EchoIdent('msp'); ?>"><?php _e('Password History Policy', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
                             <?php _e('Remember'); ?>
@@ -908,20 +909,20 @@ class WpPasswordPolicyManager
                                     <?php echo ($value == 0 ? '' : $value); ?>
                                     </option><?php
                                 }
-                                ?></select> <?php _e('old passwords'); ?><br/>
-                            <?php _e('Leave blank to disable password history policy.'); ?>
+                                ?></select> <?php _e('old passwords', 'wp-password-policy-manager'); ?><br/>
+                            <?php _e('Leave blank to disable password history policy.', 'wp-password-policy-manager'); ?>
                         </fieldset>
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="ExemptTokenQueryBox"><?php _e('Users and Roles Exempt From Policies'); ?></label></th>
+                    <th><label for="ExemptTokenQueryBox"><?php _e('Users and Roles Exempt From Policies', 'wp-password-policy-manager'); ?></label></th>
                     <td>
                         <fieldset>
                             <input type="text" id="ExemptTokenQueryBox" style="float: left; display: block; width: 250px;">
                             <input type="button" id="ExemptTokenQueryAdd" style="float: left; display: block;" class="button-primary" value="Add">
                             <br style="clear: both;"/>
                             <p class="description"><?php
-                                _e('Users and Roles in this list are free of all Password Policies.');
+                                _e('Users and Roles in this list are free of all Password Policies.', 'wp-password-policy-manager');
                                 ?></p>
                             <div id="ExemptTokenList"><?php
                                 foreach($this->GetExemptTokens() as $item){
@@ -936,16 +937,16 @@ class WpPasswordPolicyManager
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><label for="rst-submit-button"><?php _e("Reset All Users' Passwords");?></label></th>
-                    <td><input id="rst-submit-button" type="submit" name="<?php $this->EchoIdent('rst'); ?>" class="button-secondary" value="<?php esc_attr_e(__('Reset All Passwords')); ?>"
-                               onclick="return confirm(<?php esc_attr_e(json_encode(__('Are you sure you want to reset all passwords?'))); ?>);"/></td>
+                    <th scope="row"><label for="rst-submit-button"><?php _e("Reset All Users' Passwords", 'wp-password-policy-manager');?></label></th>
+                    <td><input id="rst-submit-button" type="submit" name="<?php $this->EchoIdent('rst'); ?>" class="button-secondary" value="<?php esc_attr_e(__('Reset All Passwords', 'wp-password-policy-manager')); ?>"
+                               onclick="return confirm(<?php esc_attr_e(json_encode(__('Are you sure you want to reset all passwords?', 'wp-password-policy-manager'))); ?>);"/></td>
                 </tr>
 
                 </tbody>
             </table>
             <!-- Policy Flags: <?php echo $this->_policy_flag_cache; ?> -->
             <p class="submit">
-                <input type="submit" name="<?php $this->EchoIdent('snt'); ?>" class="button-primary" value="<?php esc_attr_e(__('Save Changes')); ?>" />
+                <input type="submit" name="<?php $this->EchoIdent('snt'); ?>" class="button-primary" value="<?php esc_attr_e(__('Save Changes', 'wp-password-policy-manager')); ?>" />
             </p>
         </form>
         </div><?php
@@ -1071,17 +1072,17 @@ class WpPasswordPolicyManager
     public function plugin_action_links($old_links){
         $new_links = array(
             '<a href="' . admin_url('options-general.php?page=password_policy_settings') . '">' .
-            __('Configure Password Policies') .
+            __('Configure Password Policies', 'wp-password-policy-manager') .
             '</a>',
         );
         return array_merge($new_links, $old_links);
     }
     public function admin_menu(){
-        add_options_page(__('Password Policies'), __('Password Policies'), 'manage_options', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
+        add_options_page(__('Password Policies', 'wp-password-policy-manager'), __('Password Policies', 'wp-password-policy-manager'), 'manage_options', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
     }
     public function network_admin_menu(){
-        add_options_page(__('Password Policies'), __('Password Policies'), 'manage_network', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
-        add_submenu_page('settings.php', __('Password Policies'), __('Password Policies'), 'manage_network_options', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
+        add_options_page(__('Password Policies', 'wp-password-policy-manager'), __('Password Policies', 'wp-password-policy-manager'), 'manage_network', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
+        add_submenu_page('settings.php', __('Password Policies', 'wp-password-policy-manager'), __('Password Policies', 'wp-password-policy-manager'), 'manage_network_options', self::PLG_CONFIG_MENU_NAME, array($this, 'ManageWpOptions'));
     }
     public function admin_enqueue_scripts(){
         wp_enqueue_style('wppm', $this->GetBaseUrl() . 'css/wppm.css', array(), filemtime($this->GetBaseDir() . 'css/wppm.css'));
@@ -1096,9 +1097,9 @@ class WpPasswordPolicyManager
     public function admin_print_footer_scripts(){
         $isOnPluginPage = isset($_REQUEST['page']) && $_REQUEST['page']==self::PLG_CONFIG_MENU_NAME;
         if($this->IsJustInstalled() && $this->IsManagingAdmin() && !$isOnPluginPage){
-            $tle = __('Configure Password Policies');
-            $txt = __('You have just installed WP Password Policy manager. All password policies are disabled by default. Click the button below to configure the WordPress password policies.');
-            $btn = __('Configure Policies');
+            $tle = __('Configure Password Policies', 'wp-password-policy-manager');
+            $txt = __('You have just installed WP Password Policy manager. All password policies are disabled by default. Click the button below to configure the WordPress password policies.', 'wp-password-policy-manager');
+            $btn = __('Configure Policies', 'wp-password-policy-manager');
             $url = admin_url('options-general.php?page='.self::PLG_CONFIG_MENU_NAME);
             ?><script type="text/javascript">
                 jQuery(function($) {
@@ -1114,9 +1115,9 @@ class WpPasswordPolicyManager
     }
     public function wp_ajax_check_security_token(){
         if(!$this->IsManagingAdmin())
-            die('Access Denied.');
+            die(__('Access Denied.', 'wp-password-policy-manager'));
         if(!isset($_REQUEST['token']))
-            die('Token parameter expected.');
+            die(__('Token parameter expected.', 'wp-password-policy-manager'));
         die($this->GetTokenType($_REQUEST['token']));
     }
     public static function on_uninstall(){
