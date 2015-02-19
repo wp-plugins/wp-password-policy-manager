@@ -5,7 +5,7 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong password, strong wordpress password, authentication, password security, password expire, strong wordpress password plugin
 Requires at least: 3.6.0
-Tested up to: 4.1
+Tested up to: 4.1.1
 Stable tag: 0.6
 
 Configure WordPress password policies to ensure all WordPress users use strong passwords and improve the security of your WordPress.
