@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl.html
 Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong password, strong wordpress password, authentication, password security, password expire, strong wordpress password plugin
 Requires at least: 3.6.0
 Tested up to: 4.1.1
-Stable tag: 0.6
+Stable tag: 0.7
 
 Configure WordPress password policies to ensure all WordPress users use strong passwords and improve the security of your WordPress.
 
@@ -54,7 +54,12 @@ Another way to ensure WordPress security is to have full control of your WordPre
 * Built-in policies do not allow for a password to be the same as WordPress user
 
 = WP Password Policy Manager in Your Language =
-We need help translating the plugin. If you're good at translating, please drop us an email on [plugins@wpwhitesecurity.com](mailto:plugins@wpwhitesecurity.com).
+We need help translating the plugin. If you're good at translating, please drop us an email on [plugins@wpwhitesecurity.com](mailto:plugins@wpwhitesecurity.com). WP Password Policy Manager is available in:
+
+Italian thanks to [Marco Borla](https://www.peopleinside.it/)
+Dutch thanks to [Anne Jan Roeleveld](http://www.annejanroeleveld.nl/)
+Polish thanks to [Piotr Matuszewski](http://www.megaweb.pl)
+Serbo-Croatian thanks to Borisa Djuraskovic from [Web Hosting Hub](http://www.webhostinghub.com/)
 
 = Plugin Newsletter =
 To keep yourself updated with what is new and updated in our WordPress security plugins please subscribe to the [WP White Security Plugins Newsletter](http://eepurl.com/Jn9sP).
@@ -84,7 +89,14 @@ If a WordPress user's password is expired, the user will be notified and asked t
 
 == Changelog ==
 
-= 0.6 (2014-01-13) =
+= 0.7 (2015-02-27) =
+* **New Feature**
+	* Added nonces to the plugin form to avoid an issue where an attacker could trick an authenticated / logged in user to reset all passwords or make other changes.
+	
+* **New Translations**
+	* The following translatoins have been added; Italian, Dutch, Polish and Serbo-Croatian.
+
+= 0.6 (2015-01-13) =
 * **New Features**
 	* Plugin is now translation ready. Contact [WP White Security](https://www.wpwhitesecurity.com/contact-wp-white-security/) for more information.
 

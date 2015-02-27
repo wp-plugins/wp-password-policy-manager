@@ -4,8 +4,9 @@ Plugin Name: WordPress Password Policy Manager
 Plugin URI: http://www.wpwhitesecurity.com/wordpress-security-plugins/wordpress-password-policy-manager-plugin/
 Description: WordPress Password Policy Manager allows WordPress administrators to configure password policies for WordPress users to use strong passwords.
 Author: WP White Security
-Version: 0.6
+Version: 0.7
 Text Domain: wp-password-policy-manager
+Domain Path: /languages/
 Author URI: http://www.wpwhitesecurity.com/
 License: GPL2
 
@@ -86,6 +87,8 @@ class WpPasswordPolicyManager
         //-- pwd reset
         add_action( 'validate_password_reset', array($this,'ValidatePasswordReset'), 10, 2 );
         add_action( 'validate_password_reset', array($this,'ModifyWpResetForm'), 10);
+        //-- Load plugin's text language files
+        add_action( 'plugins_loaded', array($this, 'LoadTextDomain'));
     }
 
     /**
@@ -102,6 +105,13 @@ class WpPasswordPolicyManager
 
 
     // <editor-fold desc="WP Internals">
+
+    /**
+     * Load plugin textdomain.
+     */
+    public function LoadTextDomain() {
+        load_plugin_textdomain('wp-password-policy-manager', false, dirname(plugin_basename(__FILE__)).'/languages/');
+    }
 
     protected function GetPasswordRules(){
         $rules = array(
@@ -714,42 +724,51 @@ class WpPasswordPolicyManager
     protected function GetPostIdent($name){
         return $_POST[self::DEF_PFX . '_' . $name];
     }
-    protected function UpdateWpOptions(){
-        if($this->IsPostIdent('ttl'))
-            $this->SetPasswordTtl($this->GetPostIdent('ttl'));
-        if($this->IsPostIdent('len'))
-            $this->SetPasswordLen($this->GetPostIdent('len'));
-        $this->SetPolicyState(self::POLICY_MIXCASE, $this->IsPostIdent('cpt'));
-        $this->SetPolicyState(self::POLICY_NUMBERS, $this->IsPostIdent('num'));
-        $this->SetPolicyState(self::POLICY_SPECIAL, $this->IsPostIdent('spc'));
-        $this->SetPolicyState(self::POLICY_OLDPASSWORD, $this->IsPostIdent('opw'));
-        $this->SetExemptTokens(isset($_REQUEST['ExemptTokens']) ? $_REQUEST['ExemptTokens'] : array());
-        if($this->IsPostIdent('msp'))
-            $this->SetMaxSamePass((int)$this->GetPostIdent('msp'));
+    protected function UpdateWpOptions()
+    {
+        if (!empty($_REQUEST['_wpnonce']) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'nonce_form' )) {
+            if($this->IsPostIdent('ttl'))
+                $this->SetPasswordTtl($this->GetPostIdent('ttl'));
+            if($this->IsPostIdent('len'))
+                $this->SetPasswordLen($this->GetPostIdent('len'));
+            $this->SetPolicyState(self::POLICY_MIXCASE, $this->IsPostIdent('cpt'));
+            $this->SetPolicyState(self::POLICY_NUMBERS, $this->IsPostIdent('num'));
+            $this->SetPolicyState(self::POLICY_SPECIAL, $this->IsPostIdent('spc'));
+            $this->SetPolicyState(self::POLICY_OLDPASSWORD, $this->IsPostIdent('opw'));
+            $this->SetExemptTokens(isset($_REQUEST['ExemptTokens']) ? $_REQUEST['ExemptTokens'] : array());
+            if($this->IsPostIdent('msp'))
+                $this->SetMaxSamePass((int)$this->GetPostIdent('msp'));
+        } else {
+            throw new Exception(__('Security check failed', 'wp-password-policy-manager'));
+        }
     }
 
     protected function ResetWpPasswords()
     {
-        $users = new WP_User_Query(array('blog_id' => 0));
-        foreach ($users->get_results() as $user) {
-            $new_password = wp_generate_password();
-            wp_set_password($new_password, $user->ID);
-            // The blogname option is escaped with esc_html on the way into the database in sanitize_option
-            // we want to reverse this for the plain text arena of emails.
-            $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+        if (!empty($_REQUEST['_wpnonce']) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'nonce_form' )) {
+            $users = new WP_User_Query(array('blog_id' => 0));
+            foreach ($users->get_results() as $user) {
+                $new_password = wp_generate_password();
+                wp_set_password($new_password, $user->ID);
+                // The blogname option is escaped with esc_html on the way into the database in sanitize_option
+                // we want to reverse this for the plain text arena of emails.
+                $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
-            $message = '<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body>';
-            $message .= sprintf(__('<p>Your password for <strong>%s</strong> has been reset.</p>', 'wp-password-policy-manager'), $blogname) . "\r\n\r\n";
-            $message .= sprintf(__('<p>New Password: <strong>%s</strong></p>', 'wp-password-policy-manager'), $new_password) . "\r\n\r\n";
-            $message .= sprintf(__('<p>Please log in and change your password:', 'wp-password-policy-manager')) . "\r\n";
-            $message .= wp_login_url() . "</p>\r\n";
-            $message .= '</body></html>';
-            $result = self::SendNotificationEmail($user->user_email, $message);
-            if ($result) {
-                // reset & expire
-                $this->SetGlobalOption(self::OPT_USER_RST_PWD . '_' . $user->ID, true);
-                update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp'));
+                $message = '<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body>';
+                $message .= sprintf(__('<p>Your password for <strong>%s</strong> has been reset.</p>', 'wp-password-policy-manager'), $blogname) . "\r\n\r\n";
+                $message .= sprintf(__('<p>New Password: <strong>%s</strong></p>', 'wp-password-policy-manager'), $new_password) . "\r\n\r\n";
+                $message .= sprintf(__('<p>Please log in and change your password:', 'wp-password-policy-manager')) . "\r\n";
+                $message .= wp_login_url() . "</p>\r\n";
+                $message .= '</body></html>';
+                $result = self::SendNotificationEmail($user->user_email, $message);
+                if ($result) {
+                    // reset & expire
+                    $this->SetGlobalOption(self::OPT_USER_RST_PWD . '_' . $user->ID, true);
+                    update_user_option($user->ID, self::OPT_NAME_UPM, current_time('timestamp'));
+                }
             }
+        } else {
+            throw new Exception(__('Security check failed', 'wp-password-policy-manager'));
         }
     }
     protected function SendNotificationEmail($emailAddress, $message){
@@ -944,6 +963,7 @@ class WpPasswordPolicyManager
 
                 </tbody>
             </table>
+            <?php wp_nonce_field( 'nonce_form' ); ?>
             <!-- Policy Flags: <?php echo $this->_policy_flag_cache; ?> -->
             <p class="submit">
                 <input type="submit" name="<?php $this->EchoIdent('snt'); ?>" class="button-primary" value="<?php esc_attr_e(__('Save Changes', 'wp-password-policy-manager')); ?>" />
