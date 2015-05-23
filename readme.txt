@@ -1,12 +1,12 @@
 === WP Password Policy Manager ===
-Contributors: WPWhiteSecurity
+Contributors: wpkytten
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=abela%2erobert%40gmail%2ecom
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: wordpress password policy, password policy, password policy manager, wordpress password, password strength, password, authentication, security, wordpress user password, strong password, strong wordpress password, authentication, password security, password expire, strong wordpress password plugin
 Requires at least: 3.6.0
-Tested up to: 4.1.1
-Stable tag: 0.7
+Tested up to: 4.2.2
+Stable tag: 0.8
 
 Configure WordPress password policies to ensure all WordPress users use strong passwords and improve the security of your WordPress.
 
@@ -88,6 +88,11 @@ If a WordPress user's password is expired, the user will be notified and asked t
 4. WordPress password policies are also applied in the lost / reset password page in WordPress ensuring strong password policies are never bypassed
 
 == Changelog ==
+
+= 0.8 (2015-05-23) =
+* ** Updated plugin ownership **
+	* Changed ownership of the plugin
+	* Updated "Tested up to" entry
 
 = 0.7 (2015-02-27) =
 * **New Feature**
